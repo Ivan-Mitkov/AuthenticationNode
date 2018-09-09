@@ -45,7 +45,7 @@ app.get('/', (req, res) => {
     res.render('home');
 });
 
-app.get('/secret', (req, res) => {
+app.get('/secret', isLoggedIn, (req, res) => {
     res.render('secret');
 });
 
@@ -74,12 +74,25 @@ app.get('/login', (req, res) => {
 });
 
 //middleware
-app.post('/login', passport.authenticate('local',{
+app.post('/login', passport.authenticate('local', {
     successRedirect: '/secret',
     failureRedirect: '/login'
 }), (req, res) => {
-
 });
+
+//logout routes
+app.get('/logout', (req, res) => {
+    req.logout();
+    res.redirect('/');
+    //still can go to /secret
+});
+
+function isLoggedIn(req, res, next) {
+    if (req.isAuthenticated()) {
+        return next();
+    }
+    res.redirect('/login');
+}
 
 
 app.listen(port, process.env.IP, () => {
